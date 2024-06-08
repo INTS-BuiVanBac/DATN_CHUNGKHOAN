@@ -28,7 +28,7 @@ if sidebar_expander.button('Xem thông tin dữ liệu'):
     # Sử dụng Yahoo Finance để lấy dữ liệu chứng khoán
     try:
         st.session_state.df = yf.download(selected_company_code, start=selected_date_start, end=selected_date_end)
-        
+
         # Hiển thị dữ liệu chứng khoán
         st.write(f'Dữ liệu chứng khoán của công ty {selected_company} từ {selected_date_start} đến {selected_date_end}:')
         st.write(st.session_state.df)
@@ -43,11 +43,11 @@ if sidebar_expander.button('Xem thông tin dữ liệu'):
 else:
     # Tải dữ liệu từ yfinance
     today = date.today()
-    start_date = today.replace(year=today.year - 10)  # Lấy dữ liệu từ năm trước đến hiện tại
+    start_date = today.replace(year=today.year - 20)  # Lấy dữ liệu từ năm trước đến hiện tại
     end_date = today
     try:
         st.session_state.df = yf.download(selected_company_code, start=start_date, end=end_date)
-        st.write(f'Dữ liệu chứng khoán của công ty {selected_company} trong 10 năm qua:')
+        st.write(f'Dữ liệu chứng khoán của công ty {selected_company} trong 20 năm qua:')
         st.write(st.session_state.df)
     except Exception as e:
         st.error(f"Không thể tải dữ liệu chứng khoán cho {selected_company_code}: {e}")
@@ -127,26 +127,6 @@ if preprocessing_expander:
             st.session_state.X_train, st.session_state.X_test, st.session_state.y_train, st.session_state.y_test = train_test_split(st.session_state.X, st.session_state.y, test_size=0.2, random_state=42)
 
             st.success("Dữ liệu đã được chia thành train và test!")
-        #     if 'X_train' and 'X_test' and 'y_train' and 'y_test' in st.session_state:
-        # # Hiển thị X_train và X_test
-        #         st.subheader("Dữ liệu X_train và X_test:")
-        #         col1, col2 = st.columns(2)
-        #         with col1:
-        #             st.write("X_train:")
-        #             st.write(st.session_state.X_train)
-        #         with col2:
-        #             st.write("X_test:")
-        #             st.write(st.session_state.X_test)
-
-        #         # Hiển thị y_train và y_test
-        #         st.subheader("Dữ liệu y_train và y_test:")
-        #         col3, col4 = st.columns(2)
-        #         with col3:
-        #             st.write("y_train:")
-        #             st.write(st.session_state.y_train)
-        #         with col4:
-        #             st.write("y_test:")
-        #             st.write(st.session_state.y_test)
         except Exception as e:
             st.error(f"Lỗi khi chia dữ liệu train-test: {e}")
     if 'X_train' and 'X_test' and 'y_train' and 'y_test' in st.session_state:
@@ -234,7 +214,8 @@ if model_training_expander:
             st.session_state.model, st.session_state.y_pred = train_model(selected_model, st.session_state.X_train_scaled, st.session_state.X_test_scaled, st.session_state.y_train, st.session_state.y_test)
             
             if st.session_state.model and st.session_state.y_pred is not None:
-                # Đánh giá mô hình
+               # if st.button('Đánh giá'):
+                    # Đánh giá mô hình
                 if selected_metric == "R2":
                     st.session_state.evaluation_score = r2_score(st.session_state.y_test, st.session_state.y_pred)
                 elif selected_metric == "MSE":
@@ -252,7 +233,10 @@ if model_training_expander:
 
     if 'evaluation_score' in st.session_state:
         st.subheader("Kết quả đánh giá mô hình:")
+        #evaluation_score_percentage = st.session_state.evaluation_score * 100
         st.write(f"{selected_metric}: {st.session_state.evaluation_score}")
+        #st.write(f"{selected_metric}: {evaluation_score_percentage}")
+       
 
 # Tạo expander mới cho dự đoán
 prediction_expander = st.sidebar.expander("Dự đoán")
@@ -277,7 +261,7 @@ if prediction_expander:
                 # Dự đoán thông qua mô hình đã chọn
                 if st.session_state.model:
                     prediction = st.session_state.model.predict(st.session_state.input_data_scaled)
-                    st.success(f"Dự đoán của mô hình: {prediction[0]}")
+                    st.success(f"Dự đoán của mô hình:${prediction[0]}")
                 else:
                     st.warning("Vui lòng huấn luyện một mô hình trước khi dự đoán.")
             except Exception as e:
